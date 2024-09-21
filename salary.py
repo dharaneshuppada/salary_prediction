@@ -4,8 +4,12 @@ import joblib
 # Load the trained model
 @st.cache_resource
 def load_model():
-    model = joblib.load('salary_prediction_model.pkl')
-    return model
+    try:
+        model = joblib.load('salary_prediction_model.pkl')
+        return model
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        return None
 
 # Main Streamlit App
 def main():
@@ -16,11 +20,14 @@ def main():
 
     # Load the model
     model = load_model()
-
-    # Prediction
-    if st.button('Predict Salary'):
-        prediction = model.predict([[years_exp]])[0]
-        st.write(f'Predicted Salary for {years_exp} years of experience: ${prediction:,.2f}')
+    
+    if model is not None:
+        # Prediction
+        if st.button('Predict Salary'):
+            prediction = model.predict([[years_exp]])[0]
+            st.write(f'Predicted Salary for {years_exp} years of experience: ${prediction:,.2f}')
+    else:
+        st.warning("Model not loaded. Please check the error message above.")
 
 # Run the app
 if __name__ == '__main__':
